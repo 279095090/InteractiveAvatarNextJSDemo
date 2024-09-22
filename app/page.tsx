@@ -1,6 +1,6 @@
 "use client";
 
-import InteractiveAvatar from "@/components/InteractiveAvatar";
+import InteractiveAvatar from "@/components/InteractiveAvatarUseAssistant";
 import InteractiveAvatarCode from "@/components/InteractiveAvatarCode";
 import { Tab, Tabs } from "@nextui-org/react";
 
@@ -11,11 +11,11 @@ export default function App() {
       label: "Demo",
       content: <InteractiveAvatar />,
     },
-    {
-      id: "code",
-      label: "Code",
-      content: <InteractiveAvatarCode />,
-    },
+    // {
+    //   id: "code",
+    //   label: "Code",
+    //   content: <InteractiveAvatarCode />,
+    // },
   ];
 
   return (

@@ -17,16 +17,12 @@ import {
   Tooltip,
 } from "@nextui-org/react";
 import { Microphone, MicrophoneStage } from "@phosphor-icons/react";
-import { useChat } from "ai/react";
+import { useAssistant } from "ai/react";
 import clsx from "clsx";
 import OpenAI from "openai";
 import { useEffect, useRef, useState } from "react";
 import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
-
-const openai = new OpenAI({
-  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true,
-});
+import { transcribeAudio } from "@/app/actions";
 
 export default function InteractiveAvatar() {
   const [isLoadingSession, setIsLoadingSession] = useState(false);
@@ -44,33 +40,57 @@ export default function InteractiveAvatar() {
   const avatar = useRef<StreamingAvatarApi | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
-  const { input, setInput, handleSubmit } = useChat({
-    onFinish: async (message) => {
-      console.log("ChatGPT Response:", message);
+  const { input, status, setInput, submitMessage, messages } = useAssistant({ api: '/api/assistant' });
+  useEffect(() => {
+    if (status != 'awaiting_message') return;
+    console.log("ChatGPT Response:", messages);
+    if (!initialized || !avatar.current) {
+      setDebug("Avatar API not initialized");
+      return;
+    }
+    console.log(messages);
 
-      if (!initialized || !avatar.current) {
-        setDebug("Avatar API not initialized");
-        return;
-      }
+    const text = messages[messages.length - 1].content.replaceAll("**", '')
+    //send the ChatGPT response to the Interactive Avatar
+    avatar.current
+      .speak({
+        taskRequest: { text, sessionId: data?.sessionId },
+      })
+      .then(() => {
+        setIsLoadingChat(false);
+      })
+      .catch((e) => {
+        setDebug(e.message);
+      });
+    // setIsLoadingChat(false);
+  }, [status]);
+  // {
+  //   onFinish: async (message) => {
+  //     console.log("ChatGPT Response:", message);
 
-      //send the ChatGPT response to the Interactive Avatar
-      await avatar.current
-        .speak({
-          taskRequest: { text: message.content, sessionId: data?.sessionId },
-        })
-        .catch((e) => {
-          setDebug(e.message);
-        });
-      setIsLoadingChat(false);
-    },
-    // initialMessages: [
-    //   {
-    //     id: "1",
-    //     role: "system",
-    //     content: "You are a helpful assistant.",
-    //   },
-    // ],
-  });
+  //     if (!initialized || !avatar.current) {
+  //       setDebug("Avatar API not initialized");
+  //       return;
+  //     }
+
+  //     //send the ChatGPT response to the Interactive Avatar
+  //     await avatar.current
+  //       .speak({
+  //         taskRequest: { text: message.content, sessionId: data?.sessionId },
+  //       })
+  //       .catch((e) => {
+  //         setDebug(e.message);
+  //       });
+  //     setIsLoadingChat(false);
+  //   },
+  //   // initialMessages: [
+  //   //   {
+  //   //     id: "1",
+  //   //     role: "system",
+  //   //     content: "You are a helpful assistant.",
+  //   //   },
+  //   // ],
+  // });
 
   async function fetchAccessToken() {
     try {
@@ -215,7 +235,9 @@ export default function InteractiveAvatar() {
             type: "audio/wav",
           });
           audioChunks.current = [];
-          transcribeAudio(audioBlob);
+          var data = new FormData();
+          data.append('audioBlob',audioBlob);
+          transcribeAudio(data).then(text=>{setInput(text!)}).catch(err=>{console.error(err)})
         };
         mediaRecorder.current.start();
         setRecording(true);
@@ -232,22 +254,15 @@ export default function InteractiveAvatar() {
     }
   }
 
-  async function transcribeAudio(audioBlob: Blob) {
-    try {
-      // Convert Blob to File
-      const audioFile = new File([audioBlob], "recording.wav", {
-        type: "audio/wav",
-      });
-      const response = await openai.audio.transcriptions.create({
-        model: "whisper-1",
-        file: audioFile,
-      });
-      const transcription = response.text;
-      console.log("Transcription: ", transcription);
-      setInput(transcription);
-    } catch (error) {
-      console.error("Error transcribing audio:", error);
+  function handlerSendMessage() {
+    setIsLoadingChat(true);
+    console.log('send to serverr ',input)
+    if (!input) {
+      setDebug("Please enter text to send to ChatGPT");
+      return;
     }
+    // handleSubmit();
+    submitMessage();
   }
 
   return (
@@ -353,7 +368,7 @@ export default function InteractiveAvatar() {
         </CardBody>
         <Divider />
         <CardFooter className="flex flex-col gap-3">
-          <InteractiveAvatarTextInput
+          {/* <InteractiveAvatarTextInput
             label="Repeat"
             placeholder="Type something for the avatar to repeat"
             input={text}
@@ -361,18 +376,13 @@ export default function InteractiveAvatar() {
             setInput={setText}
             disabled={!stream}
             loading={isLoadingRepeat}
-          />
+          /> */}
           <InteractiveAvatarTextInput
             label="Chat"
             placeholder="Chat with the avatar (uses ChatGPT)"
             input={input}
             onSubmit={() => {
-              setIsLoadingChat(true);
-              if (!input) {
-                setDebug("Please enter text to send to ChatGPT");
-                return;
-              }
-              handleSubmit();
+              handlerSendMessage();
             }}
             setInput={setInput}
             loading={isLoadingChat}
