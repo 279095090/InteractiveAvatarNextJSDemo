@@ -16,6 +16,7 @@ export async function transcribeAudio(data:FormData) {
       });
       const response = await openai.audio.transcriptions.create({
         model: "whisper-1",
+        language:'zh',
         file: audioFile,
       });
       const transcription = response.text;
