@@ -1,5 +1,5 @@
-import fetch from 'node-fetch';
-import HttpsProxyAgent from 'https-proxy-agent';
+import fetch,{RequestInit} from 'node-fetch';
+import {HttpsProxyAgent} from 'https-proxy-agent';
 const proxyUrl = 'http://127.0.0.1:7890';
 // Replace <proxy_url> with your actual proxy URL
 
@@ -13,7 +13,7 @@ export async function POST() {
       throw new Error("API key is missing from .env");
     }
 
-    const opts={
+    const opts:RequestInit={
       method: "POST",
       headers: {
         "x-api-key": HEYGEN_API_KEY,
@@ -21,14 +21,14 @@ export async function POST() {
     }
     if(HTTP_PROXY){
       console.log(`use http proxy:${HTTP_PROXY}`)
-      const agent = new HttpsProxyAgent.HttpsProxyAgent(HTTP_PROXY);
+      const agent = new HttpsProxyAgent(HTTP_PROXY);
       opts.agent=agent;
     }
     const res = await fetch(
       "https://api.heygen.com/v1/streaming.create_token",
       opts
     );
-    const data = await res.json();
+    const data = await res.json() as any;
 
     return new Response(data.data.token, {
       status: 200,

@@ -1,10 +1,10 @@
 'use server'
 import OpenAI from "openai";
-import HttpsProxyAgent from 'https-proxy-agent';
+import {HttpsProxyAgent} from 'https-proxy-agent';
 
 const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY || '',
-    httpAgent:process.env.HTTP_PROXY ?new HttpsProxyAgent.HttpsProxyAgent(process.env.HTTP_PROXY):''
+    httpAgent:process.env.HTTP_PROXY ?new HttpsProxyAgent(process.env.HTTP_PROXY):''
   });
 
 export async function transcribeAudio(data:FormData) {

@@ -1,13 +1,12 @@
 import OpenAI from 'openai';
 import { AssistantResponse } from 'ai';
-import HttpsProxyAgent from 'https-proxy-agent';
-// import { openai } from '@ai-sdk/openai';
+import {HttpsProxyAgent} from 'https-proxy-agent';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || '',
   organization:'org-m6eQDPtdps1E69GKBEqdtOMl',
   project:'proj_g8UWLm4RvwfpK5jKkj0CGt5z',
-  httpAgent:process.env.HTTP_PROXY ?new HttpsProxyAgent.HttpsProxyAgent(process.env.HTTP_PROXY):''
+  httpAgent:process.env.HTTP_PROXY ?new HttpsProxyAgent(process.env.HTTP_PROXY):''
 });
 const threadId='thread_sfA5cNxkABXZmgvcL6AYjoVQ';
 
