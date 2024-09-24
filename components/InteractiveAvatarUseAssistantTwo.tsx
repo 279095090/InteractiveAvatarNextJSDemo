@@ -331,7 +331,7 @@ export default function InteractiveAvatar() {
         {/* {stream &&  */}
         {/* <CardFooter className="flex flex-col gap-3  py-1 absolute bottom-1"> */}
 
-        <div className="w-full flex flex-row relative items-center gap-2 z-40">
+        <div className="w-full flex flex-row relative items-center gap-2" style={{ zIndex: 99 }}>
           {isText ? (
             <InteractiveAvatarTextInput
               disabled={!stream}
@@ -382,6 +382,6 @@ export default function InteractiveAvatar() {
       {/* </CardFooter> */}
       {/* } */}
       {/* </Card> */}
-    </div>
+    </div >
   );
 }
