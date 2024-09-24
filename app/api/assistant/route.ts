@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     role: 'user',
     content: input.message,
   });
-
+  
   return AssistantResponse(
     { threadId, messageId: createdMessage.id },
     async ({ forwardStream }) => {
