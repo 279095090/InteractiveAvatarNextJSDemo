@@ -1,24 +1,27 @@
-import './Wave.css'
 import clsx from "clsx";
 
-interface WaveProps{
-    play:boolean
+import style from "./Wave.module.css";
+
+interface WaveProps {
+  play: boolean;
 }
 
-export default function Wave({play=false}:WaveProps) {
-    return <div className ={clsx("recorder",play && "animation")}>
-        <div className="wave"></div>
-        <div className="wave"></div>
-        <div className="wave"></div>
-        <div className="wave"></div>
-        <div className="wave"></div>
-        <div className="wave"></div>
-        <div className="wave"></div>
-        <div className="wave"></div>
-        <div className="wave"></div>
-        <div className="wave"></div>
-        <div className="wave"></div>
-        <div className="wave"></div>
-        <div className="wave"></div>
+export default function Wave({ play = false }: WaveProps) {
+  return (
+    <div className={clsx(style.recorder, play && style.animation)}>
+      <div className={style.wave} />
+      <div className={style.wave} />
+      <div className={style.wave} />
+      <div className={style.wave} />
+      <div className={style.wave} />
+      <div className={style.wave} />
+      <div className={style.wave} />
+      <div className={style.wave} />
+      <div className={style.wave} />
+      <div className={style.wave} />
+      <div className={style.wave} />
+      <div className={style.wave} />
+      <div className={style.wave} />
     </div>
+  );
 }

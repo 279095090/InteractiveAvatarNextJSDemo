@@ -1,32 +1,20 @@
-import { AVATARS, VOICES } from "@/app/lib/constants";
 import {
   Configuration,
   NewSessionData,
-  StreamingAvatarApi
+  StreamingAvatarApi,
 } from "@heygen/streaming-avatar";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardFooter,
-  Divider,
-  Input,
-  Select,
-  SelectItem,
-  Spinner,
-  Tooltip,
-} from "@nextui-org/react";
-import { Keyboard, Microphone, MicrophoneStage } from "@phosphor-icons/react";
+import { Button, Spinner, Tooltip } from "@nextui-org/react";
+import { Keyboard, Microphone } from "@phosphor-icons/react";
 import { useAssistant } from "ai/react";
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
+
 import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
 import MessageList from "./MessageList";
 import MicrophoneInput from "./MicrophoneInput";
 
-
-const avatarId = '60439e8c0fe7428bb9b6c41772258a6b';//'Angela-insuit-20220820';
-const voiceId = 'dbb805f1b63a40ec869c66819ade215e';
+const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; //'Angela-insuit-20220820';
+const voiceId = "dbb805f1b63a40ec869c66819ade215e";
 
 export default function InteractiveAvatar() {
   const [isLoadingSession, setIsLoadingSession] = useState(false);
@@ -43,21 +31,25 @@ export default function InteractiveAvatar() {
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
   const [isText, swithText] = useState(true);
-  const { input, status, setInput, submitMessage, messages } = useAssistant({ api: '/api/assistant' });
-  const [touched, setTouched] = useState(false)
+  const { input, status, setInput, submitMessage, messages } = useAssistant({
+    api: "/api/assistant",
+  });
+  const [touched, setTouched] = useState(false);
   const firstflag = useRef(true); //移除首次加载两次
   const [microInputChangeFlags, SetMicroInputChangeFlags] = useState(false);
+
   useEffect(() => {
     //触发播放
-    if (status != 'awaiting_message' || messages.length == 0) return;
+    if (status != "awaiting_message" || messages.length == 0) return;
     console.log("ChatGPT Response:", messages);
     if (!initialized || !avatar.current) {
       setDebug("Avatar API not initialized");
+
       return;
     }
 
+    const text = messages[messages.length - 1].content.replaceAll("**", "");
 
-    const text = messages[messages.length - 1].content.replaceAll("**", '')
     //send the ChatGPT response to the Interactive Avatar
     avatar.current
       .speak({
@@ -78,11 +70,14 @@ export default function InteractiveAvatar() {
         method: "POST",
       });
       const token = await response.text();
+
       // const token = 'eyJ0b2tlbiI6ICJhYmIyZjhlOWI2Nzg0MmI2ODgwYTUxNDRmZGEzNmVjYSIsICJ0b2tlbl90eXBlIjogInNhX2Zyb21fdHJpYWwiLCAiY3JlYXRlZF9hdCI6IDE3MjY3NTgyOTF9'
       console.log("Access Token:", token); // Log the token to verify
+
       return token;
     } catch (error) {
       console.error("Error fetching access token:", error);
+
       return "";
     }
   }
@@ -92,6 +87,7 @@ export default function InteractiveAvatar() {
     await updateToken();
     if (!avatar.current) {
       setDebug("Avatar API is not initialized");
+
       return;
     }
     try {
@@ -103,14 +99,15 @@ export default function InteractiveAvatar() {
             voice: { voiceId: voiceId },
           },
         },
-        setDebug
+        setDebug,
       );
+
       setData(res);
       setStream(avatar.current.mediaStream);
     } catch (error) {
       console.error("Error starting avatar session:", error);
       setDebug(
-        `There was an error starting the session. ${voiceId ? "This custom voice ID may not be supported." : ""}`
+        `There was an error starting the session. ${voiceId ? "This custom voice ID may not be supported." : ""}`,
       );
     }
     setIsLoadingSession(false);
@@ -118,9 +115,10 @@ export default function InteractiveAvatar() {
 
   async function updateToken() {
     const newToken = await fetchAccessToken();
+
     console.log("Updating Access Token:", newToken); // Log token for debugging
     avatar.current = new StreamingAvatarApi(
-      new Configuration({ accessToken: newToken, jitterBuffer: 200 })
+      new Configuration({ accessToken: newToken, jitterBuffer: 200 }),
     );
 
     const startTalkCallback = (e: any) => {
@@ -141,6 +139,7 @@ export default function InteractiveAvatar() {
   async function handleInterrupt() {
     if (!initialized || !avatar.current) {
       setDebug("Avatar API not initialized");
+
       return;
     }
     await avatar.current
@@ -153,23 +152,24 @@ export default function InteractiveAvatar() {
   async function endSession() {
     if (!initialized || !avatar.current) {
       setDebug("Avatar API not initialized");
+
       return;
     }
     await avatar.current.stopAvatar(
       { stopSessionRequest: { sessionId: data?.sessionId } },
-      setDebug
+      setDebug,
     );
     setStream(undefined);
-    console.info('end session');
+    console.info("end session");
   }
 
   async function handleSpeak(text: string) {
     setIsLoadingRepeat(true);
     if (!initialized || !avatar.current) {
       setDebug("Avatar API not initialized");
+
       return;
     }
-
 
     await avatar.current
       .speak({ taskRequest: { text: text, sessionId: data?.sessionId } })
@@ -183,9 +183,9 @@ export default function InteractiveAvatar() {
     if (touched && initialized) {
       // console.log('222222')
       // if(mediaStream.current)mediaStream.current.muted=false;
-      handleSpeak('你好，有什么可以帮你');
+      handleSpeak("你好，有什么可以帮你");
     }
-  }, [touched, initialized])
+  }, [touched, initialized]);
 
   useEffect(() => {
     if (!firstflag.current) {
@@ -205,10 +205,11 @@ export default function InteractiveAvatar() {
       const firstTouchAction = () => {
         if (!touched) {
           setTouched(true);
-          document.body.removeEventListener('click', firstTouchAction);
+          document.body.removeEventListener("click", firstTouchAction);
         }
-      }
-      document.body.addEventListener('click', firstTouchAction);
+      };
+
+      document.body.addEventListener("click", firstTouchAction);
     }
     init();
     firstflag.current = false;
@@ -233,14 +234,14 @@ export default function InteractiveAvatar() {
     if (stream && mediaStream.current) {
       mediaStream.current!.pause();
     }
-
-  }
+  };
 
   function handlerSendMessage() {
     setIsLoadingChat(true);
-    console.log('send to serverr ', input)
+    console.log("send to serverr ", input);
     if (!input) {
       setDebug("Please enter text to send to ChatGPT");
+
       return;
     }
     // handleSubmit();
@@ -252,7 +253,7 @@ export default function InteractiveAvatar() {
       handlerSendMessage();
       SetMicroInputChangeFlags(false);
     }
-  }, [microInputChangeFlags, input])
+  }, [microInputChangeFlags, input]);
 
   function micSubmit(content: string) {
     setInput(content);
@@ -260,16 +261,16 @@ export default function InteractiveAvatar() {
   }
 
   return (
-    <div className="page w-full flex flex-col overflow-hidden">
+    <div className="page w-full flex flex-col justify-center items-center overflow-hidden">
       {/* <Card isFooterBlurred> */}
       {/* <CardBody className="h-screen flex flex-col justify-center items-center overflow-hidden"> */}
       {stream ? (
-        <div className="container h-full w-full justify-center items-center flex rounded-lg overflow-hidden">
+        <div className="container h-full w-full justify-center  items-center flex flex-row rounded-lg overflow-hidden z-30 pb-8">
           <video
             ref={mediaStream}
             autoPlay
-            muted={!touched}
             playsInline
+            muted={!touched}
             style={{
               width: "100%",
               height: "100%",
@@ -299,55 +300,64 @@ export default function InteractiveAvatar() {
           {/* <span className="display-none">{touched + ''}</span> */}
         </div>
       ) : !isLoadingSession ? (
-        <div className="h-full justify-center items-center flex flex-col gap-8 w-[500px] self-center">
+        <div className="h-full justify-center items-center flex flex-col gap-8 w-[500px] self-center z-30">
           <span>初始化中....</span>
         </div>
       ) : (
-        <Spinner size="lg" color="default" />
+        <Spinner color="default" size="lg" />
       )}
 
-      {initialized && !touched && !isLoadingSession ? (<div className="h-full absolute justify-center items-center flex flex-col gap-8 w-[500px] self-center">
-        <span>请点击开始对话</span>
-      </div>) : null}
+      {initialized && !touched && !isLoadingSession ? (
+        <div className="h-full absolute justify-center items-center flex flex-col gap-8 w-[500px] self-center z-99">
+          <span>请点击开始对话</span>
+        </div>
+      ) : null}
 
-      {input && !isText ? (<div className="h-full absolute top-0 left-0 justify-center items-center flex flex-col gap-8 w-[500px] self-center">
-        <span>{input}</span>
-      </div>) : null}
+      {input && !isText ? (
+        <div className="h-full absolute justify-center items-center flex flex-col gap-8 w-full self-center z-99 px-4">
+          <span className="text-warp backdrop-blur-sm bg-white/10  rounded-md p-1">{input}</span>
+        </div>
+      ) : null}
 
-      <p className="font-mono text-right absolute top-1 right-1">
+      <p className="font-mono text-right absolute top-1 right-1 z-40">
         {/* <span className="font-bold">Console:</span>
         <br /> */}
         {debug}
       </p>
       <div className="flex flex-col w-full absolute bottom-2 gap-1 px-2">
-        <div className="w-full overflow-hidden max-h-30">
+        <div className="w-full overflow-hidden z-20">
           <MessageList messages={messages} />
         </div>
         {/* {stream &&  */}
         {/* <CardFooter className="flex flex-col gap-3  py-1 absolute bottom-1"> */}
 
         <div className="w-full flex flex-row relative items-center gap-2">
-
-          {isText ?
+          {isText ? (
             <InteractiveAvatarTextInput
-              label="Chat"
-              placeholder="请输入你的问题"
+              disabled={!stream}
               input={input}
+              label="Chat"
+              loading={isLoadingChat}
+              placeholder="请输入你的问题"
+              setInput={setInput}
               onSubmit={() => {
                 handlerSendMessage();
               }}
-              setInput={setInput}
-              loading={isLoadingChat}
-              disabled={!stream}
-            /> : <MicrophoneInput onSubmit={micSubmit} contentChange={(content) => { setInput(content) }} />}
+            />
+          ) : (
+            <MicrophoneInput
+              contentChange={(content) => {
+                setInput(content);
+              }}
+              onSubmit={micSubmit}
+            />
+          )}
 
           {/* <Button size="sm" isIconOnly className="w-1 text-white bg-gradient-to-tr from-indigo-500 to-indigo-300"
             variant="shadow">
             <Keyboard onClick={() => swithText(!isText)} size={24} />
           </Button> */}
-          <Tooltip
-            content={!recording ? "Start recording" : "Stop recording"}
-          >
+          <Tooltip content={!isText ? "切换键盘" : "切换录音"}>
             <Button
               // onClick={!recording ? startRecording : stopRecording}
               // isDisabled={!stream}
@@ -356,16 +366,13 @@ export default function InteractiveAvatar() {
                 "mr text-white w-1",
                 !recording
                   ? "bg-gradient-to-tr from-indigo-500 to-indigo-300"
-                  : ""
+                  : "",
               )}
-              size="sm"
+              size="md"
               variant="shadow"
               onClick={() => swithText(!isText)}
             >
-              {!isText ? (<Keyboard size={24} />) :
-
-                <Microphone size={20} />
-              }
+              {!isText ? <Keyboard size={30} /> : <Microphone size={30} />}
             </Button>
           </Tooltip>
         </div>
@@ -375,7 +382,6 @@ export default function InteractiveAvatar() {
       {/* </CardFooter> */}
       {/* } */}
       {/* </Card> */}
-
     </div>
   );
 }

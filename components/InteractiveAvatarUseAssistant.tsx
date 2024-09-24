@@ -1,4 +1,3 @@
-import { AVATARS, VOICES } from "@/app/lib/constants";
 import {
   Configuration,
   NewSessionData,
@@ -19,9 +18,11 @@ import {
 import { Microphone, MicrophoneStage } from "@phosphor-icons/react";
 import { useAssistant } from "ai/react";
 import clsx from "clsx";
-import OpenAI from "openai";
 import { useEffect, useRef, useState } from "react";
+
 import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
+
+import { AVATARS, VOICES } from "@/app/lib/constants";
 import { transcribeAudio } from "@/app/actions";
 
 export default function InteractiveAvatar() {
@@ -40,17 +41,22 @@ export default function InteractiveAvatar() {
   const avatar = useRef<StreamingAvatarApi | null>(null);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
-  const { input, status, setInput, submitMessage, messages } = useAssistant({ api: '/api/assistant' });
+  const { input, status, setInput, submitMessage, messages } = useAssistant({
+    api: "/api/assistant",
+  });
+
   useEffect(() => {
-    if (status != 'awaiting_message') return;
+    if (status != "awaiting_message") return;
     console.log("ChatGPT Response:", messages);
     if (!initialized || !avatar.current) {
       setDebug("Avatar API not initialized");
+
       return;
     }
     console.log(messages);
 
-    const text = messages[messages.length - 1].content.replaceAll("**", '')
+    const text = messages[messages.length - 1].content.replaceAll("**", "");
+
     //send the ChatGPT response to the Interactive Avatar
     avatar.current
       .speak({
@@ -98,11 +104,14 @@ export default function InteractiveAvatar() {
         method: "POST",
       });
       const token = await response.text();
+
       // const token = 'eyJ0b2tlbiI6ICJhYmIyZjhlOWI2Nzg0MmI2ODgwYTUxNDRmZGEzNmVjYSIsICJ0b2tlbl90eXBlIjogInNhX2Zyb21fdHJpYWwiLCAiY3JlYXRlZF9hdCI6IDE3MjY3NTgyOTF9'
       console.log("Access Token:", token); // Log the token to verify
+
       return token;
     } catch (error) {
       console.error("Error fetching access token:", error);
+
       return "";
     }
   }
@@ -112,6 +121,7 @@ export default function InteractiveAvatar() {
     await updateToken();
     if (!avatar.current) {
       setDebug("Avatar API is not initialized");
+
       return;
     }
     try {
@@ -123,14 +133,15 @@ export default function InteractiveAvatar() {
             voice: { voiceId: voiceId },
           },
         },
-        setDebug
+        setDebug,
       );
+
       setData(res);
       setStream(avatar.current.mediaStream);
     } catch (error) {
       console.error("Error starting avatar session:", error);
       setDebug(
-        `There was an error starting the session. ${voiceId ? "This custom voice ID may not be supported." : ""}`
+        `There was an error starting the session. ${voiceId ? "This custom voice ID may not be supported." : ""}`,
       );
     }
     setIsLoadingSession(false);
@@ -138,9 +149,10 @@ export default function InteractiveAvatar() {
 
   async function updateToken() {
     const newToken = await fetchAccessToken();
+
     console.log("Updating Access Token:", newToken); // Log token for debugging
     avatar.current = new StreamingAvatarApi(
-      new Configuration({ accessToken: newToken })
+      new Configuration({ accessToken: newToken }),
     );
 
     const startTalkCallback = (e: any) => {
@@ -161,6 +173,7 @@ export default function InteractiveAvatar() {
   async function handleInterrupt() {
     if (!initialized || !avatar.current) {
       setDebug("Avatar API not initialized");
+
       return;
     }
     await avatar.current
@@ -173,11 +186,12 @@ export default function InteractiveAvatar() {
   async function endSession() {
     if (!initialized || !avatar.current) {
       setDebug("Avatar API not initialized");
+
       return;
     }
     await avatar.current.stopAvatar(
       { stopSessionRequest: { sessionId: data?.sessionId } },
-      setDebug
+      setDebug,
     );
     setStream(undefined);
   }
@@ -186,6 +200,7 @@ export default function InteractiveAvatar() {
     setIsLoadingRepeat(true);
     if (!initialized || !avatar.current) {
       setDebug("Avatar API not initialized");
+
       return;
     }
     await avatar.current
@@ -199,9 +214,10 @@ export default function InteractiveAvatar() {
   useEffect(() => {
     async function init() {
       const newToken = await fetchAccessToken();
+
       console.log("Initializing with Access Token:", newToken); // Log token for debugging
       avatar.current = new StreamingAvatarApi(
-        new Configuration({ accessToken: newToken, jitterBuffer: 200 })
+        new Configuration({ accessToken: newToken, jitterBuffer: 200 }),
       );
       setInitialized(true); // Set initialized to true
     }
@@ -234,10 +250,18 @@ export default function InteractiveAvatar() {
           const audioBlob = new Blob(audioChunks.current, {
             type: "audio/wav",
           });
+
           audioChunks.current = [];
           var data = new FormData();
-          data.append('audioBlob',audioBlob);
-          transcribeAudio(data).then(text=>{setInput(text!)}).catch(err=>{console.error(err)})
+
+          data.append("audioBlob", audioBlob);
+          transcribeAudio(data)
+            .then((text) => {
+              setInput(text!);
+            })
+            .catch((err) => {
+              console.error(err);
+            });
         };
         mediaRecorder.current.start();
         setRecording(true);
@@ -256,9 +280,10 @@ export default function InteractiveAvatar() {
 
   function handlerSendMessage() {
     setIsLoadingChat(true);
-    console.log('send to serverr ',input)
+    console.log("send to serverr ", input);
     if (!input) {
       setDebug("Please enter text to send to ChatGPT");
+
       return;
     }
     // handleSubmit();
@@ -285,18 +310,18 @@ export default function InteractiveAvatar() {
               </video>
               <div className="flex flex-col gap-2 absolute bottom-3 right-3">
                 <Button
-                  size="md"
-                  onClick={handleInterrupt}
                   className="bg-gradient-to-tr from-indigo-500 to-indigo-300 text-white rounded-lg"
+                  size="md"
                   variant="shadow"
+                  onClick={handleInterrupt}
                 >
                   Interrupt task
                 </Button>
                 <Button
-                  size="md"
-                  onClick={endSession}
                   className="bg-gradient-to-tr from-indigo-500 to-indigo-300  text-white rounded-lg"
+                  size="md"
                   variant="shadow"
+                  onClick={endSession}
                 >
                   End session
                 </Button>
@@ -309,9 +334,9 @@ export default function InteractiveAvatar() {
                   Custom Avatar ID (optional)
                 </p>
                 <Input
+                  placeholder="Enter a custom avatar ID"
                   value={avatarId}
                   onChange={(e) => setAvatarId(e.target.value)}
-                  placeholder="Enter a custom avatar ID"
                 />
                 <Select
                   placeholder="Or select one from these example avatars"
@@ -335,9 +360,9 @@ export default function InteractiveAvatar() {
                   Custom Voice ID (optional)
                 </p>
                 <Input
+                  placeholder="Enter a custom voice ID"
                   value={voiceId}
                   onChange={(e) => setVoiceId(e.target.value)}
-                  placeholder="Enter a custom voice ID"
                 />
                 <Select
                   placeholder="Or select one from these example voices"
@@ -354,16 +379,16 @@ export default function InteractiveAvatar() {
                 </Select>
               </div>
               <Button
-                size="md"
-                onClick={startSession}
                 className="bg-gradient-to-tr from-indigo-500 to-indigo-300 w-full text-white"
+                size="md"
                 variant="shadow"
+                onClick={startSession}
               >
                 Start session
               </Button>
             </div>
           ) : (
-            <Spinner size="lg" color="default" />
+            <Spinner color="default" size="lg" />
           )}
         </CardBody>
         <Divider />
@@ -378,43 +403,43 @@ export default function InteractiveAvatar() {
             loading={isLoadingRepeat}
           /> */}
           <InteractiveAvatarTextInput
-            label="Chat"
-            placeholder="Chat with the avatar (uses ChatGPT)"
-            input={input}
-            onSubmit={() => {
-              handlerSendMessage();
-            }}
-            setInput={setInput}
-            loading={isLoadingChat}
+            disabled={!stream}
             endContent={
               <Tooltip
                 content={!recording ? "Start recording" : "Stop recording"}
               >
                 <Button
-                  onClick={!recording ? startRecording : stopRecording}
-                  isDisabled={!stream}
                   isIconOnly
                   className={clsx(
                     "mr-4 text-white",
                     !recording
                       ? "bg-gradient-to-tr from-indigo-500 to-indigo-300"
-                      : ""
+                      : "",
                   )}
+                  isDisabled={!stream}
                   size="sm"
                   variant="shadow"
+                  onClick={!recording ? startRecording : stopRecording}
                 >
                   {!recording ? (
                     <Microphone size={20} />
                   ) : (
                     <>
-                      <div className="absolute h-full w-full bg-gradient-to-tr from-indigo-500 to-indigo-300 animate-pulse -z-10"></div>
+                      <div className="absolute h-full w-full bg-gradient-to-tr from-indigo-500 to-indigo-300 animate-pulse -z-10" />
                       <MicrophoneStage size={20} />
                     </>
                   )}
                 </Button>
               </Tooltip>
             }
-            disabled={!stream}
+            input={input}
+            label="Chat"
+            loading={isLoadingChat}
+            placeholder="Chat with the avatar (uses ChatGPT)"
+            setInput={setInput}
+            onSubmit={() => {
+              handlerSendMessage();
+            }}
           />
         </CardFooter>
       </Card>
