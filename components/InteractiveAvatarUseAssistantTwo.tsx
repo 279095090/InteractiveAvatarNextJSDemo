@@ -261,11 +261,11 @@ export default function InteractiveAvatar() {
   }
 
   return (
-    <div className="page w-screen h-screen flex flex-col justify-center items-center overflow-hidden">
+    <div className="page w-screen h-[calc(100dvh)] flex flex-col justify-center items-center overflow-hidden">
       {/* <Card isFooterBlurred> */}
-      {/* <CardBody className="h-screen flex flex-col justify-center items-center overflow-hidden"> */}
+      {/* <CardBody className="h-[calc(100dvh)] flex flex-col justify-center items-center overflow-hidden"> */}
       {stream ? (
-        <div className="container w-screen h-screen justify-center  items-center flex flex-row rounded-lg overflow-hidden z-30 pb-8">
+        <div className="container w-screen h-[calc(100dvh)] justify-center  items-center flex flex-row rounded-lg overflow-hidden z-30 pb-8">
           <video
             ref={mediaStream}
             autoPlay
