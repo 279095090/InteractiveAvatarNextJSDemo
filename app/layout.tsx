@@ -44,9 +44,9 @@ export default function RootLayout({
       lang="en"
     >
       <head />
-      <body className={clsx("min-h-screen bg-background antialiased")}>
+      <body className={clsx("min-h-screen bg-background antialiased overflow-hidden")}>
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <main className="relative flex flex-col h-screen w-screen">
+          <main className="relative flex flex-col h-screen w-screen overflow-hidden">
             {/* <NavBar /> */}
             {children}
           </main>
