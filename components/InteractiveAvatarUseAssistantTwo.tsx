@@ -265,7 +265,7 @@ export default function InteractiveAvatar() {
       {/* <Card isFooterBlurred> */}
       {/* <CardBody className="h-[calc(100dvh)] flex flex-col justify-center items-center overflow-hidden"> */}
       {stream ? (
-        <div className="container w-screen h-[calc(100dvh)] justify-center  items-center flex flex-row rounded-lg overflow-hidden z-30 pb-8">
+        <div className="container w-screen  h-[calc(100dvh)] justify-center  items-center flex flex-row rounded-lg overflow-hidden z-30">
           <video
             ref={mediaStream}
             autoPlay
@@ -308,14 +308,14 @@ export default function InteractiveAvatar() {
       )}
 
       {initialized && !touched && !isLoadingSession ? (
-        <div className="h-full justify-center absolute top-0 left-0 items-center flex flex-col gap-8 w-full self-center z-50">
-          <span>请点击开始对话</span>
+        <div className="h-full justify-center absolute top-0 left-0 items-center flex flex-col gap-8 w-full self-center ">
+          <span className="z-50 cursor-pointer" >请点击开始对话</span>
         </div>
       ) : null}
 
       {input && !isText ? (
-        <div className="h-full justify-center absolute top-0 left-0 items-center flex flex-col gap-8 w-full self-center z-50">
-          <span className="text-warp backdrop-blur-sm bg-white/10  rounded-md p-1">{input}</span>
+        <div className="h-full justify-center absolute top-0 left-0 items-center flex flex-col gap-8 w-full self-center ">
+          <span className="text-warp backdrop-blur-sm bg-white/10  rounded-md p-1 z-50">{input}</span>
         </div>
       ) : null}
 
@@ -324,8 +324,8 @@ export default function InteractiveAvatar() {
         <br /> */}
         {debug}
       </p>
-      <div className="flex flex-col w-full absolute bottom-2 gap-1 px-2">
-        <div className="w-full overflow-hidden z-20 max-h-[200px]">
+      <div className="flex flex-col w-full absolute bottom-2 gap-1 px-2 z-40">
+        <div className="w-full overflow-hidden z-20 max-h-[200px] rounded py-1">
           <MessageList messages={messages} />
         </div>
         {/* {stream &&  */}
