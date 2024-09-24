@@ -2,6 +2,9 @@ import OpenAI from "openai";
 import { AssistantResponse } from "ai";
 import { HttpsProxyAgent } from "https-proxy-agent";
 
+
+export const maxDuration = 60;
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
   organization: "org-m6eQDPtdps1E69GKBEqdtOMl",
