@@ -15,7 +15,7 @@ Feel free to play around with the existing code and please leave any feedback fo
 
 3. Run `npm install` (assuming you have npm installed. If not, please follow these instructions: https://docs.npmjs.com/downloading-and-installing-node-js-and-npm/)
 
-4. Enter your HeyGen Enterprise API Token or Trial Token in the `.env` file. Replace `PLACEHOLDER-API-KEY` with your API key. This will allow the Client app to generate secure Access Tokens with which to create interactive sessions.
+4. Enter your HeyGen Enterprise API Token or Trial Token in the `.env` file. Replace `HEYGEN_API_KEY` with your API key. This will allow the Client app to generate secure Access Tokens with which to create interactive sessions.
 
    You can retrieve either the API Key or Trial Token by logging in to HeyGen and navigating to this page in your settings: [https://app.heygen.com/settings?nav=API]. NOTE: use the trial token if you don't have an enterprise API token yet.
 
@@ -66,14 +66,6 @@ By default, there are several Public Avatars that can be used in Interactive Ava
 In order to use a private Avatar created under your own account in Interactive Avatar, it must be upgraded to be a Interactive Avatar. Only 1. Finetune Instant Avatars and 2. Studio Avatars are able to be upgraded to Interactive Avatars. This upgrade is a one-time fee and can be purchased by navigating to [app.heygen.com/interactive-avatar] and clicking 'Select Avatar'.
 
 Please note that Photo Avatars are not compatible with Interactive Avatar and cannot be used.
-
-### Which voices can I use with my Interactive Avatar?
-
-Most of HeyGen's AI Voices can be used with the Interactive Avatar API. To find the Voice IDs that you can use, please use the List Voices v2 endpoint from HeyGen: [https://docs.heygen.com/reference/list-voices-v2]
-
-Please note that for voices that support Emotions, such as Christine and Tarquin, you need to pass in the Emotion string in the Voice Setting parameter: [https://docs.heygen.com/reference/new-session-copy#voicesetting]
-
-You can also set the speed at which the Interactive Avatar speaks by passing in a Rate in the Voice Setting.
 
 ### Where can I read more about enterprise-level usage of the Interactive Avatar API?
 
