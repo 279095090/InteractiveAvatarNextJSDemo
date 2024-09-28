@@ -69,6 +69,11 @@ export async function POST(req: Request) {
             throw new Error("ASSISTANT_ID environment is not set");
           })(),
       });
+      runStream.on('textDelta', (textDelta, snapshot) => {
+        if (textDelta.annotations && textDelta.annotations.length > 0) {
+          textDelta.value = '';
+        }
+      });
 
       await forwardStream(runStream);
     },

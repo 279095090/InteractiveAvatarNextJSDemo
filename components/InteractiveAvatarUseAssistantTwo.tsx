@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "react";
 
 import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
 import MessageList from "./MessageList";
-import MicrophoneInput from "./MicrophoneInput";
+import MicrophoneInput, { MicrophoneStatus } from "./MicrophoneInput";
 
 const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; //'Angela-insuit-20220820';
 const voiceId = "dbb805f1b63a40ec869c66819ade215e";
@@ -23,14 +23,16 @@ export default function InteractiveAvatar() {
   const [stream, setStream] = useState<MediaStream>();
   const [debug, setDebug] = useState<string>();
   const [data, setData] = useState<NewSessionData>();
-  const [text, setText] = useState<string>("");
   const [initialized, setInitialized] = useState(false); // Track initialization
   const [recording, setRecording] = useState(false); // Track recording state
   const mediaStream = useRef<HTMLVideoElement>(null);
   const avatar = useRef<StreamingAvatarApi | null>(null);
-  const mediaRecorder = useRef<MediaRecorder | null>(null);
-  const audioChunks = useRef<Blob[]>([]);
   const [isText, swithText] = useState(true);
+  const [isListening, setListening] = useState(false);
+  const [talking, setTalking] = useState(false);
+  const [tips, setTips] = useState('')
+  const [showReplay, setShowReplay] = useState(false);
+
   const { input, status, setInput, submitMessage, messages } = useAssistant({
     api: "/api/assistant",
   });
@@ -42,7 +44,7 @@ export default function InteractiveAvatar() {
     //触发播放
     if (status != "awaiting_message" || messages.length == 0) return;
     console.log("ChatGPT Response:", messages);
-    if (!initialized || !avatar.current) {
+    if (!avatar.current) {
       setDebug("Avatar API not initialized");
 
       return;
@@ -51,17 +53,8 @@ export default function InteractiveAvatar() {
     const text = messages[messages.length - 1].content.replaceAll("**", "");
 
     //send the ChatGPT response to the Interactive Avatar
-    avatar.current
-      .speak({
-        taskRequest: { text, sessionId: data?.sessionId },
-      })
-      .then(() => {
-        setIsLoadingChat(false);
-      })
-      .catch((e) => {
-        setDebug(e.message);
-      });
-    // setIsLoadingChat(false);
+    handleSpeak(text);
+    setIsLoadingChat(false);
   }, [status]);
 
   async function fetchAccessToken() {
@@ -104,6 +97,7 @@ export default function InteractiveAvatar() {
 
       setData(res);
       setStream(avatar.current.mediaStream);
+      setShowReplay(false);
     } catch (error) {
       console.error("Error starting avatar session:", error);
       setDebug(
@@ -112,6 +106,14 @@ export default function InteractiveAvatar() {
     }
     setIsLoadingSession(false);
   }
+
+
+  useEffect(() => {
+    console.log(debug)
+    if (debug && debug?.indexOf('disconnected') > -1) {
+      setShowReplay(true)
+    }
+  }, [debug])
 
   async function updateToken() {
     const newToken = await fetchAccessToken();
@@ -122,10 +124,12 @@ export default function InteractiveAvatar() {
     );
 
     const startTalkCallback = (e: any) => {
+      setTalking(true);
       console.log("Avatar started talking", e);
     };
 
     const stopTalkCallback = (e: any) => {
+      setTalking(false);
       console.log("Avatar stopped talking", e);
     };
 
@@ -137,7 +141,7 @@ export default function InteractiveAvatar() {
   }
 
   async function handleInterrupt() {
-    if (!initialized || !avatar.current) {
+    if (!avatar.current) {
       setDebug("Avatar API not initialized");
 
       return;
@@ -150,7 +154,7 @@ export default function InteractiveAvatar() {
   }
 
   async function endSession() {
-    if (!initialized || !avatar.current) {
+    if (!avatar.current) {
       setDebug("Avatar API not initialized");
 
       return;
@@ -165,7 +169,7 @@ export default function InteractiveAvatar() {
 
   async function handleSpeak(text: string) {
     setIsLoadingRepeat(true);
-    if (!initialized || !avatar.current) {
+    if (!avatar.current) {
       setDebug("Avatar API not initialized");
 
       return;
@@ -174,6 +178,7 @@ export default function InteractiveAvatar() {
     await avatar.current
       .speak({ taskRequest: { text: text, sessionId: data?.sessionId } })
       .catch((e) => {
+        console.log('error:' + e.message);
         setDebug(e.message);
       });
     setIsLoadingRepeat(false);
@@ -181,8 +186,6 @@ export default function InteractiveAvatar() {
 
   useEffect(() => {
     if (touched && initialized) {
-      // console.log('222222')
-      // if(mediaStream.current)mediaStream.current.muted=false;
       handleSpeak("你好，有什么可以帮你");
     }
   }, [touched, initialized]);
@@ -246,6 +249,7 @@ export default function InteractiveAvatar() {
     }
     // handleSubmit();
     submitMessage();
+    setListening(false);
   }
 
   useEffect(() => {
@@ -255,17 +259,48 @@ export default function InteractiveAvatar() {
     }
   }, [microInputChangeFlags, input]);
 
+
+  useEffect(() => {
+    if (status == 'in_progress') {
+      setTips('我正在思考,请稍后')
+    } else {
+      if (isText) {
+        setTips('');
+        return;
+      }
+
+      if (talking) {
+        setTips(input)
+        return;
+      }
+      if (isListening) {
+        setTips(input || '我正在听')
+      } else {
+        setTips('点击麦克风，开始聊天');
+      }
+    }
+  }, [status, isText, talking, isListening, input]);
+
   function micSubmit(content: string) {
     setInput(content);
     SetMicroInputChangeFlags(true);
   }
 
+  function parse() {
+    if (avatar.current) {
+      if (mediaStream.current?.played) {
+        mediaStream.current.pause();
+      } else {
+        mediaStream.current?.play();
+      }
+    }
+  }
+
+
   return (
     <div className="page w-screen h-[calc(100dvh)] flex flex-col justify-center items-center overflow-hidden">
-      {/* <Card isFooterBlurred> */}
-      {/* <CardBody className="h-[calc(100dvh)] flex flex-col justify-center items-center overflow-hidden"> */}
-      {stream ? (
-        <div className="container w-screen  h-[calc(100dvh)] justify-center  items-center flex flex-row rounded-lg overflow-hidden z-30">
+      {stream && (
+        <div className="container w-screen  h-[calc(100dvh)] justify-center  items-center flex flex-row rounded-lg overflow-hidden z-30 relative">
           <video
             ref={mediaStream}
             autoPlay
@@ -279,45 +314,37 @@ export default function InteractiveAvatar() {
           >
             <track kind="captions" />
           </video>
-          {/* <div className="flex flex-col gap-2 absolute bottom-3 center">
-                <Button
-                  size="md"
-                  onClick={handleInterrupt}
-                  className="bg-gradient-to-tr from-indigo-500 to-indigo-300 text-white rounded-lg"
-                  variant="shadow"
-                >
-                  Interrupt task
-                </Button>
-                <Button
-                  size="md"
-                  onClick={endSession}
-                  className="bg-gradient-to-tr from-indigo-500 to-indigo-300  text-white rounded-lg"
-                  variant="shadow"
-                >
-                  End session
-                </Button>
-              </div> */}
-          {/* <span className="display-none">{touched + ''}</span> */}
         </div>
-      ) : !isLoadingSession ? (
+      )}
+      {isLoadingSession && (
         <div className="h-full justify-center absolute top-0 left-0 items-center flex flex-col gap-8 w-full self-center z-50">
+          <Spinner color="default" size="lg" />
           <span>初始化中....</span>
         </div>
-      ) : (
-        <Spinner color="default" size="lg" />
       )}
 
-      {initialized && !touched && !isLoadingSession ? (
+      {!touched && !isLoadingSession ? (
         <div className="h-full justify-center absolute top-0 left-0 items-center flex flex-col gap-8 w-full self-center ">
           <span className="z-50 cursor-pointer" >请点击开始对话</span>
         </div>
       ) : null}
 
-      {input && !isText ? (
+      {tips && (
         <div className="h-full justify-center absolute top-0 left-0 items-center flex flex-col gap-8 w-full self-center ">
-          <span className="text-warp backdrop-blur-sm bg-white/10  rounded-md p-1 z-50">{input}</span>
+          <span className="text-warp backdrop-blur-sm bg-white/10  rounded-md p-1 z-50">
+            {tips}
+          </span>
         </div>
-      ) : null}
+      )}
+
+      {showReplay && (
+        <div className="h-full justify-center absolute top-0 left-0 items-center flex flex-col gap-8 w-full self-center ">
+          <div className="text-warp backdrop-blur-sm bg-white/10  rounded-md p-1 z-50 h-120 w-120  rounded-md flex flex-col items-center p-4">
+            <Button color="danger" size="md" onClick={startSession}>Replay</Button>
+            <span className="text-color">会话已失效,点击重新启动会话</span>
+          </div>
+        </div>
+      )}
 
       <p className="font-mono text-right absolute top-1 right-1 z-40">
         {/* <span className="font-bold">Console:</span>
@@ -328,8 +355,6 @@ export default function InteractiveAvatar() {
         <div className="w-full overflow-hidden z-20 max-h-[200px] rounded py-1">
           <MessageList messages={messages} />
         </div>
-        {/* {stream &&  */}
-        {/* <CardFooter className="flex flex-col gap-3  py-1 absolute bottom-1"> */}
 
         <div className="w-full flex flex-row relative items-center gap-2" style={{ zIndex: 99 }}>
           {isText ? (
@@ -350,17 +375,14 @@ export default function InteractiveAvatar() {
                 setInput(content);
               }}
               onSubmit={micSubmit}
+              onStatusChange={(status => {
+                setListening(status == MicrophoneStatus.Listening)
+              })}
             />
           )}
 
-          {/* <Button size="sm" isIconOnly className="w-1 text-white bg-gradient-to-tr from-indigo-500 to-indigo-300"
-            variant="shadow">
-            <Keyboard onClick={() => swithText(!isText)} size={24} />
-          </Button> */}
           <Tooltip content={!isText ? "切换键盘" : "切换录音"}>
             <Button
-              // onClick={!recording ? startRecording : stopRecording}
-              // isDisabled={!stream}
               isIconOnly
               className={clsx(
                 "mr text-white w-1",
@@ -377,11 +399,6 @@ export default function InteractiveAvatar() {
           </Tooltip>
         </div>
       </div>
-      {/* </CardBody> */}
-
-      {/* </CardFooter> */}
-      {/* } */}
-      {/* </Card> */}
     </div >
   );
 }
