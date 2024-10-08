@@ -186,7 +186,7 @@ export default function InteractiveAvatar() {
 
   useEffect(() => {
     if (touched && initialized) {
-      handleSpeak("你好，有什么可以帮你");
+      handleSpeak("你好，有什麼可以幫你");
     }
   }, [touched, initialized]);
 
@@ -262,7 +262,7 @@ export default function InteractiveAvatar() {
 
   useEffect(() => {
     if (status == 'in_progress') {
-      setTips('我正在思考,请稍后')
+      setTips('我正在思考，請稍後')
     } else {
       if (isText) {
         setTips('');
@@ -274,9 +274,9 @@ export default function InteractiveAvatar() {
         return;
       }
       if (isListening) {
-        setTips(input || '我正在听')
+        setTips(input || '我正在聽')
       } else {
-        setTips('点击麦克风，开始聊天');
+        setTips('點擊麥克風，開始聊天');
       }
     }
   }, [status, isText, talking, isListening, input]);
@@ -325,7 +325,7 @@ export default function InteractiveAvatar() {
 
       {!touched && !isLoadingSession ? (
         <div className="h-full justify-center absolute top-0 left-0 items-center flex flex-col gap-8 w-full self-center ">
-          <span className="z-50 cursor-pointer" >请点击开始对话</span>
+          <span className="z-50 cursor-pointer" >請點擊開始對話</span>
         </div>
       ) : null}
 
@@ -341,16 +341,16 @@ export default function InteractiveAvatar() {
         <div className="h-full justify-center absolute top-0 left-0 items-center flex flex-col gap-8 w-full self-center ">
           <div className="text-warp backdrop-blur-sm bg-white/10  rounded-md p-1 z-50 h-120 w-120  rounded-md flex flex-col items-center p-4">
             <Button color="danger" size="md" onClick={startSession}>Replay</Button>
-            <span className="text-color">会话已失效,点击重新启动会话</span>
+            <span className="text-color">會話已失效，點擊重新啟動工作階段</span>
           </div>
         </div>
       )}
-
+      {/*
       <p className="font-mono text-right absolute top-1 right-1 z-40">
-        {/* <span className="font-bold">Console:</span>
-        <br /> */}
+         <span className="font-bold">Console:</span>
+        <br /> 
         {debug}
-      </p>
+      </p>*/}
       <div className="flex flex-col w-full absolute bottom-2 gap-1 px-2 z-40">
         <div className="w-full overflow-hidden z-20 max-h-[200px] rounded py-1">
           <MessageList messages={messages} />
@@ -363,7 +363,7 @@ export default function InteractiveAvatar() {
               input={input}
               label="Chat"
               loading={isLoadingChat}
-              placeholder="请输入你的问题"
+              placeholder="請輸入你的問題"
               setInput={setInput}
               onSubmit={() => {
                 handlerSendMessage();
@@ -381,7 +381,7 @@ export default function InteractiveAvatar() {
             />
           )}
 
-          <Tooltip content={!isText ? "切换键盘" : "切换录音"}>
+          <Tooltip content={!isText ? "切換鍵盤" : "切換錄音"}>
             <Button
               isIconOnly
               className={clsx(
