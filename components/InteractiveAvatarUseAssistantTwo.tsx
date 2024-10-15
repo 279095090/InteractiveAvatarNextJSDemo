@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
 import MessageList from "./MessageList";
 import MicrophoneInput, { MicrophoneStatus } from "./MicrophoneInput";
+import { PauseCircle } from "@phosphor-icons/react/dist/ssr";
 
 const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; //'Angela-insuit-20220820';
 const voiceId = "dbb805f1b63a40ec869c66819ade215e";
@@ -168,20 +169,17 @@ export default function InteractiveAvatar() {
   }
 
   async function handleSpeak(text: string) {
-    setIsLoadingRepeat(true);
     if (!avatar.current) {
       setDebug("Avatar API not initialized");
 
       return;
     }
-
     await avatar.current
       .speak({ taskRequest: { text: text, sessionId: data?.sessionId } })
       .catch((e) => {
         console.log('error:' + e.message);
         setDebug(e.message);
-      });
-    setIsLoadingRepeat(false);
+      })
   }
 
   useEffect(() => {
@@ -300,20 +298,23 @@ export default function InteractiveAvatar() {
   return (
     <div className="page w-screen h-[calc(100dvh)] flex flex-col justify-center items-center overflow-hidden">
       {stream && (
-        <div className="container w-screen  h-[calc(100dvh)] justify-center  items-center flex flex-row rounded-lg overflow-hidden z-30 relative">
+        <div className="w-screen  h-[calc(100dvh)] justify-center  items-center flex flex-row rounded-lg overflow-hidden z-30 relative">
           <video
             ref={mediaStream}
             autoPlay
             playsInline
             muted={!touched}
-            style={{
-              width: "100%",
-              height: "100%",
-              objectFit: "contain",
-            }}
+            // style={{
+            //   width: "100%",
+            //   height: "100%",
+            //   objectFit: "contain",
+            // }}
+            className="max-w-none h-full max-h-[80%] ml-[-40px] tablet:w-full tablet:max-h-full tablet:ml-0 laptop:max-h-full laptop:h-full  desktop:w-full desktop:h-auto"
           >
             <track kind="captions" />
           </video>
+
+
         </div>
       )}
       {isLoadingSession && (
@@ -342,6 +343,15 @@ export default function InteractiveAvatar() {
           <div className="text-warp backdrop-blur-sm bg-white/10  rounded-md p-1 z-50 h-120 w-120  rounded-md flex flex-col items-center p-4">
             <Button color="danger" size="md" onClick={startSession}>Replay</Button>
             <span className="text-color">會話已失效，點擊重新啟動工作階段</span>
+          </div>
+        </div>
+      )}
+
+      {talking && (
+        <div className="h-full justify-center absolute top-0 left-0 items-end flex flex-col gap-8 w-full self-center ">
+          <div className="text-warp backdrop-blur-sm bg-black/10  rounded-md p-1 z-50 h-120 w-120 mr-4  rounded-md flex flex-col p-1">
+            {/* <Button color="warning" size="md" onClick={handleInterrupt}>打断</Button> */}
+            <PauseCircle size={50} className="text-black-400" onClick={handleInterrupt} />
           </div>
         </div>
       )}
