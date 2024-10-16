@@ -1,5 +1,5 @@
 import { Input, Spinner, Tooltip } from "@nextui-org/react";
-import { PaperPlaneRight } from "@phosphor-icons/react";
+import { PaperPlaneRight, StopCircle } from "@phosphor-icons/react";
 import clsx from "clsx";
 
 interface StreamingAvatarTextInputProps {
@@ -8,9 +8,11 @@ interface StreamingAvatarTextInputProps {
   input: string;
   onSubmit: () => void;
   setInput: (value: string) => void;
+  onStop?: () => void;
   endContent?: React.ReactNode;
   disabled?: boolean;
   loading?: boolean;
+  talking?: boolean;
 }
 
 export default function InteractiveAvatarTextInput({
@@ -19,9 +21,11 @@ export default function InteractiveAvatarTextInput({
   input,
   onSubmit,
   setInput,
+  onStop = () => { },
   endContent,
   disabled = false,
   loading = false,
+  talking = false
 }: StreamingAvatarTextInputProps) {
   function handleSubmit() {
     if (input.trim() === "") {
@@ -44,7 +48,7 @@ export default function InteractiveAvatarTextInput({
                   color="default"
                   size="sm"
                 />
-              ) : (
+              ) : (!talking ?
                 <button
                   className="focus:outline-none"
                   type="submit"
@@ -56,6 +60,19 @@ export default function InteractiveAvatarTextInput({
                       disabled && "opacity-50",
                     )}
                     size={24}
+                  /></button>
+                :
+                <button
+                  className="focus:outline-none"
+                  type="submit"
+                  onClick={onStop}
+                >
+                  <StopCircle
+                    className={clsx(
+                      "text-danger-400",
+                      disabled && "opacity-50",
+                    )}
+                    size={40}
                   />
                 </button>
               )}
@@ -72,7 +89,7 @@ export default function InteractiveAvatarTextInput({
           }
         }}
         onValueChange={setInput}
-        // isDisabled={disabled}
+      // isDisabled={disabled}
       />
     </div>
   );

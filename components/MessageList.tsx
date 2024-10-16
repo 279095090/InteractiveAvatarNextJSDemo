@@ -16,7 +16,7 @@ export default function MessageList({ messages }: MessageListProps) {
       {messages.map((message: Message) => (
         <div key={message.id} className="flex flex-row ">
           {/* <span className="w-16 after:content-[':']">{message.role}</span> */}
-          <span className="flex-1 backdrop-blur-sm bg-white/10 rounded-md text-sm p-1">
+          <span className="flex-1 backdrop-blur-sm bg-white/10 rounded-md text-base p-1 ">
             {message.content}
           </span>
         </div>

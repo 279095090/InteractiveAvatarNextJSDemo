@@ -9,6 +9,7 @@ export enum MicrophoneStatus {
 }
 
 interface MicrophoneInputProps {
+  talking: boolean;
   contentChange?: (content: string) => void;
   onSubmit?: (content: string) => void;
   onStopPlay?: () => void;
@@ -19,6 +20,7 @@ const SpeechRecognition =
   globalThis.SpeechRecognition || globalThis.webkitSpeechRecognition;
 
 export default function MicrophoneInput({
+  talking = false,
   contentChange,
   onSubmit,
   onStopPlay,

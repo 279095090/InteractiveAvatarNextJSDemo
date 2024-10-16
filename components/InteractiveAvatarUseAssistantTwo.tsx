@@ -4,7 +4,7 @@ import {
   StreamingAvatarApi,
 } from "@heygen/streaming-avatar";
 import { Button, Spinner, Tooltip } from "@nextui-org/react";
-import { Keyboard, Microphone } from "@phosphor-icons/react";
+import { Keyboard, Microphone, StopCircle } from "@phosphor-icons/react";
 import { useAssistant } from "ai/react";
 import clsx from "clsx";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +14,8 @@ import MessageList from "./MessageList";
 import MicrophoneInput, { MicrophoneStatus } from "./MicrophoneInput";
 import { PauseCircle } from "@phosphor-icons/react/dist/ssr";
 
-const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; //'Angela-insuit-20220820';
+// const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; //'Angela-insuit-20220820';
+const avatarId = "52f3786c8c9543248a5cfcddad53813a"
 const voiceId = "dbb805f1b63a40ec869c66819ade215e";
 
 export default function InteractiveAvatar() {
@@ -309,7 +310,7 @@ export default function InteractiveAvatar() {
             //   height: "100%",
             //   objectFit: "contain",
             // }}
-            className="max-w-none h-full max-h-[80%] ml-[-40px] tablet:w-full tablet:max-h-full tablet:ml-0 laptop:max-h-full laptop:h-full  desktop:w-full desktop:h-auto"
+            className="max-w-none h-full max-h-full tablet:w-full tablet:max-h-full tablet:ml-0 laptop:max-h-full laptop:h-full  desktop:w-full desktop:h-auto"
           >
             <track kind="captions" />
           </video>
@@ -347,14 +348,13 @@ export default function InteractiveAvatar() {
         </div>
       )}
 
-      {talking && (
+      {/* {talking && (
         <div className="h-full justify-center absolute top-0 left-0 items-end flex flex-col gap-8 w-full self-center ">
           <div className="text-warp backdrop-blur-sm bg-black/10  rounded-md p-1 z-50 h-120 w-120 mr-4  rounded-md flex flex-col p-1">
-            {/* <Button color="warning" size="md" onClick={handleInterrupt}>打断</Button> */}
             <PauseCircle size={50} className="text-black-400" onClick={handleInterrupt} />
           </div>
         </div>
-      )}
+      )} */}
       {/*
       <p className="font-mono text-right absolute top-1 right-1 z-40">
          <span className="font-bold">Console:</span>
@@ -362,7 +362,7 @@ export default function InteractiveAvatar() {
         {debug}
       </p>*/}
       <div className="flex flex-col w-full absolute bottom-2 gap-1 px-2 z-40">
-        <div className="w-full overflow-hidden z-20 max-h-[200px] rounded py-1">
+        <div className="w-full overflow-hidden z-20 max-h-[200px] rounded py-1 mb-12">
           <MessageList messages={messages} />
         </div>
 
@@ -372,23 +372,36 @@ export default function InteractiveAvatar() {
               disabled={!stream}
               input={input}
               label="Chat"
+              talking={talking}
               loading={isLoadingChat}
               placeholder="請輸入你的問題"
               setInput={setInput}
+              onStop={() => { handleInterrupt() }}
               onSubmit={() => {
                 handlerSendMessage();
               }}
             />
           ) : (
-            <MicrophoneInput
-              contentChange={(content) => {
-                setInput(content);
-              }}
-              onSubmit={micSubmit}
-              onStatusChange={(status => {
-                setListening(status == MicrophoneStatus.Listening)
-              })}
-            />
+            talking ?
+              <div className="w-full flex flex-row justify-center ">
+                <Button
+                  size="lg"
+                  radius="full"
+                  className="bg-danger-500 mt-[-50] ml-10"
+                  isIconOnly>
+                  <StopCircle fontSize={80} onClick={() => handleInterrupt()} />
+                </Button>
+              </div> :
+              <MicrophoneInput
+                contentChange={(content) => {
+                  setInput(content);
+                }}
+                talking={talking}
+                onSubmit={micSubmit}
+                onStatusChange={(status => {
+                  setListening(status == MicrophoneStatus.Listening)
+                })}
+              />
           )}
 
           <Tooltip content={!isText ? "切換鍵盤" : "切換錄音"}>
