@@ -31,7 +31,7 @@ export default function InteractiveAvatar() {
   const avatar = useRef<StreamingAvatarApi | null>(null);
   const [isText, swithText] = useState(true);
   const [isListening, setListening] = useState(false);
-  const [talking, setTalking] = useState(false);
+  const [talking, setTalking] = useState(true);
   const [tips, setTips] = useState('')
   const [showReplay, setShowReplay] = useState(false);
 
@@ -202,7 +202,7 @@ export default function InteractiveAvatar() {
       // setInitialized(true); // Set initialized to true
       // //auto startSession
       // //TODO auto start
-      await startSession();
+      // await startSession();
 
       const firstTouchAction = () => {
         if (!touched) {
@@ -383,11 +383,11 @@ export default function InteractiveAvatar() {
             />
           ) : (
             talking ?
-              <div className="w-full flex flex-row justify-center ">
+              <div className="w-full flex flex-row justify-center relative">
                 <Button
                   // size="lg"
                   radius="full"
-                  className="bg-danger-500 mt-[-50] ml-10 h-16 w-16"
+                  className="bg-danger-500 ml-10 h-16 w-16 absolute bottom-2"
                   isIconOnly>
                   <StopCircle fontSize={80} onClick={() => handleInterrupt()} />
                 </Button>
