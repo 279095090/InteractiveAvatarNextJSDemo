@@ -385,9 +385,9 @@ export default function InteractiveAvatar() {
             talking ?
               <div className="w-full flex flex-row justify-center ">
                 <Button
-                  size="lg"
+                  // size="lg"
                   radius="full"
-                  className="bg-danger-500 mt-[-50] ml-10"
+                  className="bg-danger-500 mt-[-50] ml-10 h-16 w-16"
                   isIconOnly>
                   <StopCircle fontSize={80} onClick={() => handleInterrupt()} />
                 </Button>
