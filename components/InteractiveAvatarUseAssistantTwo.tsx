@@ -31,7 +31,7 @@ export default function InteractiveAvatar() {
   const avatar = useRef<StreamingAvatarApi | null>(null);
   const [isText, swithText] = useState(true);
   const [isListening, setListening] = useState(false);
-  const [talking, setTalking] = useState(true);
+  const [talking, setTalking] = useState(false);
   const [tips, setTips] = useState('')
   const [showReplay, setShowReplay] = useState(false);
 
@@ -202,7 +202,7 @@ export default function InteractiveAvatar() {
       // setInitialized(true); // Set initialized to true
       // //auto startSession
       // //TODO auto start
-      // await startSession();
+      await startSession();
 
       const firstTouchAction = () => {
         if (!touched) {
