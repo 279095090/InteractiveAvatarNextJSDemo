@@ -14,8 +14,8 @@ import MessageList from "./MessageList";
 import MicrophoneInput, { MicrophoneStatus } from "./MicrophoneInput";
 import { PauseCircle } from "@phosphor-icons/react/dist/ssr";
 
-// const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; //'Angela-insuit-20220820';
-const avatarId = "52f3786c8c9543248a5cfcddad53813a"
+const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; //'Angela-insuit-20220820';
+//const avatarId = "52f3786c8c9543248a5cfcddad53813a"
 const voiceId = "dbb805f1b63a40ec869c66819ade215e";
 
 export default function InteractiveAvatar() {
@@ -310,7 +310,7 @@ export default function InteractiveAvatar() {
             //   height: "100%",
             //   objectFit: "contain",
             // }}
-            className="max-w-none h-full max-h-full tablet:w-full tablet:max-h-full tablet:ml-0 laptop:max-h-full laptop:h-full  desktop:w-full desktop:h-auto"
+            className="max-w-none h-full max-h-[80%] ml-[-40px] tablet:w-full tablet:max-h-full tablet:ml-0 laptop:max-h-full laptop:h-full  desktop:w-full desktop:h-auto"
           >
             <track kind="captions" />
           </video>
