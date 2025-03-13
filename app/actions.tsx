@@ -12,9 +12,9 @@ const openai = new OpenAI({
 export async function transcribeAudio(data: FormData) {
   try {
     // Convert Blob to File
-    const audioBlob = data.get("audioBlob") as Blob;
-    const audioFile = new File([audioBlob], "recording.wav", {
-      type: "audio/wav",
+    const audioBlob = data.get("audio") as Blob;
+    const audioFile = new File([audioBlob], "audio.webm", {
+      type: "audio/webm",
     });
     const response = await openai.audio.transcriptions.create({
       model: "whisper-1",
