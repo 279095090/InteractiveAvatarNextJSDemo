@@ -6,6 +6,6 @@ export default function(){
 
     return <div>
         <div>{text}</div>
-        <AudioRecorder onTranscriptionComplete={(text)=>setText(text)}/>
+        <AudioRecorder onSubmit={(text)=>setText(text)}/>
     </div>
 }

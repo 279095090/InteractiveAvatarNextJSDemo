@@ -13,10 +13,14 @@ import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
 import MessageList from "./MessageList";
 import MicrophoneInput, { MicrophoneStatus } from "./MicrophoneInput";
 import { PauseCircle } from "@phosphor-icons/react/dist/ssr";
+import AudioRecorder from "./AudioRecorder";
 
-const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; //'Angela-insuit-20220820';
-//const avatarId = "52f3786c8c9543248a5cfcddad53813a"
-const voiceId = "dbb805f1b63a40ec869c66819ade215e";
+// const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; //'Angela-insuit-20220820';
+// //const avatarId = "52f3786c8c9543248a5cfcddad53813a"
+// const voiceId = "dbb805f1b63a40ec869c66819ade215e";
+
+const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; 
+const voiceId = "35f6b6ac010849d38cfc99dc25e0e4b3";
 
 export default function InteractiveAvatar() {
   const [isLoadingSession, setIsLoadingSession] = useState(false);
@@ -392,16 +396,17 @@ export default function InteractiveAvatar() {
                   <StopCircle fontSize={80} onClick={() => handleInterrupt()} />
                 </Button>
               </div> :
-              <MicrophoneInput
-                contentChange={(content) => {
-                  setInput(content);
-                }}
-                talking={talking}
-                onSubmit={micSubmit}
-                onStatusChange={(status => {
-                  setListening(status == MicrophoneStatus.Listening)
-                })}
-              />
+              // <MicrophoneInput
+              //   contentChange={(content) => {
+              //     setInput(content);
+              //   }}
+              //   talking={talking}
+              //   onSubmit={micSubmit}
+              //   onStatusChange={(status => {
+              //     setListening(status == MicrophoneStatus.Listening)
+              //   })}
+              // />
+              <AudioRecorder onSubmit={micSubmit} onStatusChange={(status) => {setListening(status == MicrophoneStatus.Listening)}} />
           )}
 
           <Tooltip content={!isText ? "切換鍵盤" : "切換錄音"}>

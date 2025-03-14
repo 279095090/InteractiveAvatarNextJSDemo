@@ -1,6 +1,8 @@
 'use client'
 import { transcribeAudio } from '../app/actions'
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Wave from "./Wave";
+import { Microphone } from "@phosphor-icons/react";
 
 export enum MicrophoneStatus {
     Listening,
@@ -9,13 +11,14 @@ export enum MicrophoneStatus {
 
 interface AudioRecorderProps {
     onStatusChange?: (status: MicrophoneStatus) => void;
-    onTranscriptionComplete: (text: string) => void;
+    onSubmit: (text: string) => void;
 }
 
-export default function AudioRecorder({ onStatusChange, onTranscriptionComplete }: AudioRecorderProps) {
-    const [isRecording, setRecording] = useState(false);
+export default function AudioRecorder({ onStatusChange, onSubmit }: AudioRecorderProps) {
+    let isRecording = false;
+    const [play,setPlay]=useState(false);
     const SILENCE_THRESHOLD = 0.02; // 音量阈值 (0-1)
-    const SILENCE_DURATION = 2000;  // 静默持续时间 (毫秒)
+    const SILENCE_DURATION = 4000;  // 静默持续时间 (毫秒)
 
     let audioChunks: Blob[] = [];
     let mediaRecorder = useRef<MediaRecorder>();
@@ -42,8 +45,7 @@ export default function AudioRecorder({ onStatusChange, onTranscriptionComplete 
             scriptProcessor.connect(audioContext.destination);
 
             mediaRecorder.current = new MediaRecorder(stream);
-            audioChunks = []
-            setRecording(true);
+            audioChunks = []        
 
             mediaRecorder.current.ondataavailable = (event) => {
                 if (event.data.size > 0) {
@@ -60,7 +62,7 @@ export default function AudioRecorder({ onStatusChange, onTranscriptionComplete 
                 // 计算平均音量
                 const volume = data.reduce((sum, val) => sum + Math.abs(val), 0) / data.length;
 
-                if (volume < SILENCE_THRESHOLD) {
+                if (volume < SILENCE_THRESHOLD && isRecording) {
                     if (!silenceStart) silenceStart = Date.now();
                     if (Date.now() - silenceStart > SILENCE_DURATION) {
                         console.log('Silence detected, stopping recording...');
@@ -77,14 +79,17 @@ export default function AudioRecorder({ onStatusChange, onTranscriptionComplete 
                 console.log('Audio blob size:', audioBlob.size, 'bytes');
                 const form = new FormData();
                 form.append('audio', audioBlob, 'recording.webm');
-                const text = await transcribeAudio(form);
+                const result = await transcribeAudio(form);
+                console.log('Transcription complete:'+result);
                 onStatusChange && onStatusChange(MicrophoneStatus.stopListening);
-                onTranscriptionComplete && onTranscriptionComplete(text || '');
+                onSubmit && onSubmit(result || '');
             };
 
             mediaRecorder.current.start(1000); // Collect data every second
             console.log('Started recording');
             onStatusChange && onStatusChange(MicrophoneStatus.Listening);
+            setPlay(true)
+            isRecording=true;
         } catch (error) {
             console.error('Error starting recording:', error);
             // this.onStatusChange('Error: ' + (error as Error).message);
@@ -92,12 +97,13 @@ export default function AudioRecorder({ onStatusChange, onTranscriptionComplete 
     }
 
     const stopRecording = () => {
-        if (mediaRecorder.current && isRecording) {
+        if (mediaRecorder.current) {
             console.log('Stopping recording...');
             mediaRecorder.current.stop();
             scriptProcessor?.disconnect();
             audioContext?.close();
-            setRecording(false);
+            setPlay(false)
+            isRecording=false;
             onStatusChange && onStatusChange(MicrophoneStatus.stopListening);
 
             // Stop all tracks in the stream
@@ -107,8 +113,12 @@ export default function AudioRecorder({ onStatusChange, onTranscriptionComplete 
     }
 
     return (
-        <div>
-            <button onClick={() => { isRecording ? stopRecording() : startRecording() }}>{isRecording ? "Stop" : "Start"}</button>
-        </div>
+        <button
+        className="w-full p-1 flex flex-row justify-center bg-default-100 items-center gap-4 overflow-hidden color-inherit subpixel-antialiased rounded-md bg-background/10 backdrop-blur backdrop-saturate-150"
+        onClick={startRecording}
+      >
+        <Microphone fontSize={28} color={play ? "#1f94ea" : "white"} />
+        <Wave play={play} />
+      </button>
     )
 }
