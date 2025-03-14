@@ -1,11 +1,11 @@
 import { useRef, useState } from "react";
+import { Microphone } from "@phosphor-icons/react";
 
 import Wave from "./Wave";
-import { Microphone } from "@phosphor-icons/react";
 
 export enum MicrophoneStatus {
   Listening,
-  stopListening
+  stopListening,
 }
 
 interface MicrophoneInputProps {
@@ -24,7 +24,7 @@ export default function MicrophoneInput({
   contentChange,
   onSubmit,
   onStopPlay,
-  onStatusChange
+  onStatusChange,
 }: MicrophoneInputProps) {
   const firstflag = useRef(true);
   let recognition = useRef<SpeechRecognition>();
@@ -61,7 +61,7 @@ export default function MicrophoneInput({
     recognition.current.onend = function () {
       setPlay(false);
       console.log("end");
-      onStatusChange && onStatusChange(MicrophoneStatus.stopListening)
+      onStatusChange && onStatusChange(MicrophoneStatus.stopListening);
     };
     recognition.current.onspeechend = function () {
       recognition.current!.stop();
@@ -79,7 +79,7 @@ export default function MicrophoneInput({
       className="w-full p-1 flex flex-row justify-center bg-default-100 items-center gap-4 overflow-hidden color-inherit subpixel-antialiased rounded-md bg-background/10 backdrop-blur backdrop-saturate-150"
       onClick={startPlay}
     >
-      <Microphone fontSize={28} color={play ? "#1f94ea" : "white"} />
+      <Microphone color={play ? "#1f94ea" : "white"} fontSize={28} />
       <Wave play={play} />
     </button>
   );

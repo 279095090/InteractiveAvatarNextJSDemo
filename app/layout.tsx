@@ -44,7 +44,11 @@ export default function RootLayout({
       lang="en"
     >
       <head />
-      <body className={clsx("min-h-[calc(100dvh)] bg-background antialiased overflow-hidden")}>
+      <body
+        className={clsx(
+          "min-h-[calc(100dvh)] bg-background antialiased overflow-hidden",
+        )}
+      >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <main className="relative flex flex-col h-[calc(100dvh)] w-screen overflow-hidden">
             {children}

@@ -1,6 +1,5 @@
 "use client";
 import InteractiveAvatarUseAssistantTwo from "@/components/InteractiveAvatarUseAssistantTwo";
-import Demo from "@/components/Demo";
 
 export default function App() {
   return (

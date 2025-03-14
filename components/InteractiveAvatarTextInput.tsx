@@ -21,11 +21,11 @@ export default function InteractiveAvatarTextInput({
   input,
   onSubmit,
   setInput,
-  onStop = () => { },
+  onStop = () => {},
   endContent,
   disabled = false,
   loading = false,
-  talking = false
+  talking = false,
 }: StreamingAvatarTextInputProps) {
   function handleSubmit() {
     if (input.trim() === "") {
@@ -48,7 +48,7 @@ export default function InteractiveAvatarTextInput({
                   color="default"
                   size="sm"
                 />
-              ) : (!talking ?
+              ) : !talking ? (
                 <button
                   className="focus:outline-none"
                   type="submit"
@@ -60,8 +60,9 @@ export default function InteractiveAvatarTextInput({
                       disabled && "opacity-50",
                     )}
                     size={24}
-                  /></button>
-                :
+                  />
+                </button>
+              ) : (
                 <button
                   className="focus:outline-none"
                   type="submit"
@@ -89,7 +90,7 @@ export default function InteractiveAvatarTextInput({
           }
         }}
         onValueChange={setInput}
-      // isDisabled={disabled}
+        // isDisabled={disabled}
       />
     </div>
   );

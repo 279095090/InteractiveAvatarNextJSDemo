@@ -27,8 +27,9 @@ export async function POST(req: Request) {
     message: string;
   } = await req.json();
 
-  console.log(`input threadid:${input.threadId}`)
+  console.log(`input threadid:${input.threadId}`);
   const threadId = input.threadId ?? (await openai.beta.threads.create({})).id;
+
   console.log(input.message);
   const createdMessage = await openai.beta.threads.messages.create(threadId, {
     role: "user",
@@ -39,7 +40,7 @@ export async function POST(req: Request) {
     { threadId, messageId: createdMessage.id },
     async ({ forwardStream }) => {
       const runStream = openai.beta.threads.runs.stream(threadId, {
-        model: 'gpt-4o-mini',
+        model: "gpt-4o-mini",
         instructions: instructions,
         assistant_id:
           process.env.ASSISTANT_ID ??
@@ -47,9 +48,10 @@ export async function POST(req: Request) {
             throw new Error("ASSISTANT_ID environment is not set");
           })(),
       });
-      runStream.on('textDelta', (textDelta, snapshot) => {
+
+      runStream.on("textDelta", (textDelta, snapshot) => {
         if (textDelta.annotations && textDelta.annotations.length > 0) {
-          textDelta.value = '';
+          textDelta.value = "";
         }
       });
 

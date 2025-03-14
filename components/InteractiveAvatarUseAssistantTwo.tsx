@@ -11,15 +11,14 @@ import { useEffect, useRef, useState } from "react";
 
 import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
 import MessageList from "./MessageList";
-import MicrophoneInput, { MicrophoneStatus } from "./MicrophoneInput";
-import { PauseCircle } from "@phosphor-icons/react/dist/ssr";
+import { MicrophoneStatus } from "./MicrophoneInput";
 import AudioRecorder from "./AudioRecorder";
 
 // const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; //'Angela-insuit-20220820';
 // //const avatarId = "52f3786c8c9543248a5cfcddad53813a"
 // const voiceId = "dbb805f1b63a40ec869c66819ade215e";
 
-const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; 
+const avatarId = "60439e8c0fe7428bb9b6c41772258a6b";
 const voiceId = "35f6b6ac010849d38cfc99dc25e0e4b3";
 
 export default function InteractiveAvatar() {
@@ -36,7 +35,7 @@ export default function InteractiveAvatar() {
   const [isText, swithText] = useState(true);
   const [isListening, setListening] = useState(false);
   const [talking, setTalking] = useState(false);
-  const [tips, setTips] = useState('')
+  const [tips, setTips] = useState("");
   const [showReplay, setShowReplay] = useState(false);
 
   const { input, status, setInput, submitMessage, messages } = useAssistant({
@@ -113,13 +112,12 @@ export default function InteractiveAvatar() {
     setIsLoadingSession(false);
   }
 
-
   useEffect(() => {
-    console.log(debug)
-    if (debug && debug?.indexOf('disconnected') > -1) {
-      setShowReplay(true)
+    console.log(debug);
+    if (debug && debug?.indexOf("disconnected") > -1) {
+      setShowReplay(true);
     }
-  }, [debug])
+  }, [debug]);
 
   async function updateToken() {
     const newToken = await fetchAccessToken();
@@ -182,9 +180,9 @@ export default function InteractiveAvatar() {
     await avatar.current
       .speak({ taskRequest: { text: text, sessionId: data?.sessionId } })
       .catch((e) => {
-        console.log('error:' + e.message);
+        console.log("error:" + e.message);
         setDebug(e.message);
-      })
+      });
   }
 
   useEffect(() => {
@@ -262,24 +260,25 @@ export default function InteractiveAvatar() {
     }
   }, [microInputChangeFlags, input]);
 
-
   useEffect(() => {
-    if (status == 'in_progress') {
-      setTips('我正在思考，請稍後')
+    if (status == "in_progress") {
+      setTips("我正在思考，請稍後");
     } else {
       if (isText) {
-        setTips('');
+        setTips("");
+
         return;
       }
 
       if (talking) {
-        setTips(input)
+        setTips(input);
+
         return;
       }
       if (isListening) {
-        setTips(input || '我正在聽')
+        setTips(input || "我正在聽");
       } else {
-        setTips('點擊麥克風，開始聊天');
+        setTips("點擊麥克風，開始聊天");
       }
     }
   }, [status, isText, talking, isListening, input]);
@@ -299,7 +298,6 @@ export default function InteractiveAvatar() {
     }
   }
 
-
   return (
     <div className="page w-screen h-[calc(100dvh)] flex flex-col justify-center items-center overflow-hidden">
       {stream && (
@@ -318,8 +316,6 @@ export default function InteractiveAvatar() {
           >
             <track kind="captions" />
           </video>
-
-
         </div>
       )}
       {isLoadingSession && (
@@ -331,7 +327,7 @@ export default function InteractiveAvatar() {
 
       {!touched && !isLoadingSession ? (
         <div className="h-full justify-center absolute top-0 left-0 items-center flex flex-col gap-8 w-full self-center ">
-          <span className="z-50 cursor-pointer" >請點擊開始對話</span>
+          <span className="z-50 cursor-pointer">請點擊開始對話</span>
         </div>
       ) : null}
 
@@ -346,7 +342,9 @@ export default function InteractiveAvatar() {
       {showReplay && (
         <div className="h-full justify-center absolute top-0 left-0 items-center flex flex-col gap-8 w-full self-center ">
           <div className="text-warp backdrop-blur-sm bg-white/10  rounded-md p-1 z-50 h-120 w-120  rounded-md flex flex-col items-center p-4">
-            <Button color="danger" size="md" onClick={startSession}>Replay</Button>
+            <Button color="danger" size="md" onClick={startSession}>
+              Replay
+            </Button>
             <span className="text-color">會話已失效，點擊重新啟動工作階段</span>
           </div>
         </div>
@@ -370,43 +368,54 @@ export default function InteractiveAvatar() {
           <MessageList messages={messages} />
         </div>
 
-        <div className="w-full flex flex-row relative items-center gap-2" style={{ zIndex: 99 }}>
+        <div
+          className="w-full flex flex-row relative items-center gap-2"
+          style={{ zIndex: 99 }}
+        >
           {isText ? (
             <InteractiveAvatarTextInput
               disabled={!stream}
               input={input}
               label="Chat"
-              talking={talking}
               loading={isLoadingChat}
               placeholder="請輸入你的問題"
               setInput={setInput}
-              onStop={() => { handleInterrupt() }}
+              talking={talking}
+              onStop={() => {
+                handleInterrupt();
+              }}
               onSubmit={() => {
                 handlerSendMessage();
               }}
             />
+          ) : talking ? (
+            <div className="w-full flex flex-row justify-center relative">
+              <Button
+                // size="lg"
+                isIconOnly
+                className="bg-danger-500 ml-10 h-16 w-16 absolute bottom-0"
+                radius="full"
+              >
+                <StopCircle fontSize={80} onClick={() => handleInterrupt()} />
+              </Button>
+            </div>
           ) : (
-            talking ?
-              <div className="w-full flex flex-row justify-center relative">
-                <Button
-                  // size="lg"
-                  radius="full"
-                  className="bg-danger-500 ml-10 h-16 w-16 absolute bottom-0"
-                  isIconOnly>
-                  <StopCircle fontSize={80} onClick={() => handleInterrupt()} />
-                </Button>
-              </div> :
-              // <MicrophoneInput
-              //   contentChange={(content) => {
-              //     setInput(content);
-              //   }}
-              //   talking={talking}
-              //   onSubmit={micSubmit}
-              //   onStatusChange={(status => {
-              //     setListening(status == MicrophoneStatus.Listening)
-              //   })}
-              // />
-              <AudioRecorder onSubmit={micSubmit} onStatusChange={(status) => {setListening(status == MicrophoneStatus.Listening)}} />
+            // <MicrophoneInput
+            //   contentChange={(content) => {
+            //     setInput(content);
+            //   }}
+            //   talking={talking}
+            //   onSubmit={micSubmit}
+            //   onStatusChange={(status => {
+            //     setListening(status == MicrophoneStatus.Listening)
+            //   })}
+            // />
+            <AudioRecorder
+              onStatusChange={(status) => {
+                setListening(status == MicrophoneStatus.Listening);
+              }}
+              onSubmit={micSubmit}
+            />
           )}
 
           <Tooltip content={!isText ? "切換鍵盤" : "切換錄音"}>
@@ -427,6 +436,6 @@ export default function InteractiveAvatar() {
           </Tooltip>
         </div>
       </div>
-    </div >
+    </div>
   );
 }
