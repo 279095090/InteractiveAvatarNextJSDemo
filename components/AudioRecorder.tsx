@@ -128,7 +128,7 @@ export default function AudioRecorder({
   return (
     <button
       className="w-full p-1 flex flex-row justify-center bg-default-100 items-center gap-4 overflow-hidden color-inherit subpixel-antialiased rounded-md bg-background/10 backdrop-blur backdrop-saturate-150"
-      onClick={()=>play?startRecording():stopRecording()}
+      onClick={()=>play?stopRecording():startRecording()}
     >
       <Microphone color={play ? "#1f94ea" : "white"} fontSize={28} />
       <Wave play={play} />
