@@ -30,6 +30,7 @@ export async function POST() {
       opts,
     );
     const data = (await res.json()) as any;
+    // console.log(data)
 
     return new Response(data.data.token, {
       status: 200,

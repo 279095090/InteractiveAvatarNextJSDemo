@@ -15,7 +15,7 @@ interface AudioRecorderProps {
   onStatusChange?: (status: MicrophoneStatus) => void;
   onSubmit: (text: string) => void;
 }
-
+const mimeType =  "audio/mp4;";
 export default function AudioRecorder({
   onStatusChange,
   onSubmit,
@@ -51,7 +51,7 @@ export default function AudioRecorder({
       analyser.connect(scriptProcessor);
       scriptProcessor.connect(audioContext.destination);
 
-      mediaRecorder.current = new MediaRecorder(stream);
+      mediaRecorder.current = new MediaRecorder(stream,{mimeType});
       audioChunks = [];
 
       mediaRecorder.current.ondataavailable = (event) => {
@@ -84,12 +84,12 @@ export default function AudioRecorder({
 
       mediaRecorder.current.onstop = async () => {
         console.log("Recording stopped, processing audio...");
-        const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+        const audioBlob = new Blob(audioChunks, { type:mimeType});
 
         console.log("Audio blob size:", audioBlob.size, "bytes");
         const form = new FormData();
 
-        form.append("audio", audioBlob, "recording.webm");
+        form.append("audio", audioBlob, "recording.mp4");
         const result = await transcribeAudio(form);
 
         console.log("Transcription complete:" + result);
