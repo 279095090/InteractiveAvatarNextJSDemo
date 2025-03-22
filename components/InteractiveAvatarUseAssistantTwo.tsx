@@ -7,20 +7,27 @@ import { Button, Spinner, Tooltip } from "@nextui-org/react";
 import { Keyboard, Microphone, StopCircle } from "@phosphor-icons/react";
 import { useAssistant } from "ai/react";
 import clsx from "clsx";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 
 import InteractiveAvatarTextInput from "./InteractiveAvatarTextInput";
 import MessageList from "./MessageList";
 import MicrophoneInput, { MicrophoneStatus } from "./MicrophoneInput";
 import { PauseCircle } from "@phosphor-icons/react/dist/ssr";
+import { LangContext } from "@/app/providers";
 
 const avatarId = "60439e8c0fe7428bb9b6c41772258a6b"; //'Angela-insuit-20220820';
 //const avatarId = "52f3786c8c9543248a5cfcddad53813a"
-const voiceId = "dbb805f1b63a40ec869c66819ade215e";
+const getVoiceId=(lang:string)=>{
+  switch (lang) {
+    case "zh-HK":
+      return "35f6b6ac010849d38cfc99dc25e0e4b3";
+    default://zh-CN
+      "dbb805f1b63a40ec869c66819ade215e"
+  }
+}
 
 export default function InteractiveAvatar() {
   const [isLoadingSession, setIsLoadingSession] = useState(false);
-  const [isLoadingRepeat, setIsLoadingRepeat] = useState(false);
   const [isLoadingChat, setIsLoadingChat] = useState(false);
   const [stream, setStream] = useState<MediaStream>();
   const [debug, setDebug] = useState<string>();
@@ -34,9 +41,13 @@ export default function InteractiveAvatar() {
   const [talking, setTalking] = useState(false);
   const [tips, setTips] = useState('')
   const [showReplay, setShowReplay] = useState(false);
+  const {lang} = useContext(LangContext)!;
 
   const { input, status, setInput, submitMessage, messages } = useAssistant({
     api: "/api/assistant",
+    headers:{
+      'cur_language':lang
+    }
   });
   const [touched, setTouched] = useState(false);
   const firstflag = useRef(true); //移除首次加载两次
@@ -78,6 +89,7 @@ export default function InteractiveAvatar() {
   }
 
   async function startSession() {
+    const voiceId = getVoiceId(lang)
     setIsLoadingSession(true);
     await updateToken();
     if (!avatar.current) {
@@ -91,7 +103,7 @@ export default function InteractiveAvatar() {
           newSessionRequest: {
             quality: "low",
             avatarName: avatarId,
-            voice: { voiceId: voiceId },
+            voice: { voiceId  },
           },
         },
         setDebug,

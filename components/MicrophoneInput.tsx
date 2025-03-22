@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 
 import Wave from "./Wave";
 import { Microphone } from "@phosphor-icons/react";
+import { LangContext } from "@/app/providers";
 
 export enum MicrophoneStatus {
   Listening,
@@ -30,6 +31,11 @@ export default function MicrophoneInput({
   let recognition = useRef<SpeechRecognition>();
 
   const [play, setPlay] = useState<boolean>(false);
+  const {lang} = useContext(LangContext)!;
+
+
+
+  console.log(lang)
   const handlerStop = () => {
     setPlay(false);
     onStopPlay && onStopPlay();
@@ -39,7 +45,7 @@ export default function MicrophoneInput({
     if (play) return;
     recognition.current = new SpeechRecognition();
     recognition.current.continuous = true;
-    recognition.current.lang = "zh";
+    recognition.current.lang =lang;
     recognition.current.interimResults = true;
     recognition.current.maxAlternatives = 1;
     recognition.current.onresult = function (event) {

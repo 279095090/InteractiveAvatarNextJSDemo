@@ -20,3 +20,23 @@ export function Providers({ children, themeProps }: ProvidersProps) {
     </NextUIProvider>
   );
 }
+
+
+export interface LangContextPrpos{
+  lang: string;
+  setLang: (lang: string) => void;
+} 
+
+// 创建 Context
+export const LangContext = React.createContext<LangContextPrpos|null>(null);
+
+// 定义一个包装组件，用于管理 Context 的值
+export function LangProvider({ children }: { children: React.ReactNode }) {
+  const [value, setValue] = React.useState<string>(navigator.language);
+
+  return (
+    <LangContext.Provider value={{ lang:value, setLang:setValue }}>
+      {children}
+    </LangContext.Provider>
+  );
+}
