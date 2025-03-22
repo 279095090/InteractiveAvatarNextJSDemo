@@ -32,7 +32,14 @@ export const LangContext = React.createContext<LangContextPrpos|null>(null);
 
 // 定义一个包装组件，用于管理 Context 的值
 export function LangProvider({ children }: { children: React.ReactNode }) {
-  const [value, setValue] = React.useState<string>(navigator.language);
+  const [value, setValue] = React.useState<string>("zh-CN");
+
+  React.useEffect(() => {
+    if (!!navigator.language) {
+      setValue(navigator.language);
+      console.log('set lang to '+navigator.language);
+    }
+  }, []);
 
   return (
     <LangContext.Provider value={{ lang:value, setLang:setValue }}>
