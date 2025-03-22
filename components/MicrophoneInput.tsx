@@ -35,11 +35,24 @@ export default function MicrophoneInput({
     onStopPlay && onStopPlay();
   };
 
+  /**
+   * 
+   * language:
+   * zh-HK 华 - 香港的 SAR
+   * 
+   * zh-MO 华 - 澳门的 SAR
+   * zh-CN 华 -中国
+   * zh-CHS 华 (单一化)
+   * zh-SG 华 -新加坡
+   * zh-TW 华 -台湾
+   * us en-US 英语
+   * @returns 
+   */
   const startPlay = () => {
     if (play) return;
     recognition.current = new SpeechRecognition();
     recognition.current.continuous = true;
-    recognition.current.lang = "zh";
+    recognition.current.lang = "zh-hk";
     recognition.current.interimResults = true;
     recognition.current.maxAlternatives = 1;
     recognition.current.onresult = function (event) {

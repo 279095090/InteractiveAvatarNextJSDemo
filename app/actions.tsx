@@ -19,9 +19,9 @@ export async function transcribeAudio(data: FormData) {
     //   type: "audio/webm",
     // });
     const bts = await audioFile.arrayBuffer()
-    // const filePath = path.join(process.cwd(), audioFile.name);
-    // fs.writeFileSync(filePath,new Uint8Array(bts));
-    // console.log(`save file to ${filePath}`)
+    const filePath = path.join(process.cwd(), audioFile.name);
+    fs.writeFileSync(filePath,new Uint8Array(bts));
+    console.log(`save file to ${filePath}`)
     const response = await openai.audio.transcriptions.create({
       model: "whisper-1",
       language: "zh",
